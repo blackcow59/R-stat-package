@@ -1,0 +1,149 @@
+---
+title: "201701194-최호진"
+author: "Hojin Choe"
+date: '2020 12 19 '
+output: 
+  html_document :
+    toc : true
+    toc_floct : true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# 1. 
+"canadian.txt"는 캐나다 각 도시의 월별 평균 기온자료이다. 다음 명령문을 이용하여
+자료를 불러들여올 수 있다.
+data=read.table("canadian.txt",header=TRUE,sep="\t")
+```{r}
+require(tidyverse)
+```
+
+
+## a. 
+개체수와 변수의 갯수를 밝히고 마지막 region 변수를 factor 로 변환하시오.
+(region 변수는 각 도시를 지리학적으로 분류한 것이다.)
+
+
+```{r}
+getwd()
+data <- read.table("C:/r-project/R-stat-package/data/canadian.txt", header=TRUE, sep="\t")
+str(data)
+data %>% 
+  mutate(region = factor(region)) 
+
+```
+
+## b. 
+이 자료에 대해 중간값 다듬기를 진행하고, 모수의 추정치를 밝히시오. (교재
+7 장 참고)
+```{r}
+med.data <- medpolish(data[,-13])
+```
+
+
+## c. 
+가법모형이 적절한지 그래프를 통해 판단하시오.
+```{r}
+attach(med.data)
+comparison <- matrix(row, ncol = 1) %*% matrix(col, nrow = 1)/overall
+plot(residuals ~ comparison, xlim = c(-70, 70), ylim = c(-70, 70))
+plot(residuals ~ comparison, xlim = c(-20, 20), ylim = c(-20, 20))
+detach(med.data)
+```
+
+비교값 대 잔차의 산점도를 보면 "비교값 > 0" 인경우 "잔차 < 0" 이고 "비교값 < 0" 인경우 "잔차 > 0" 인 경향이 있음을 볼 수 있다. 이것은 가법적 모형이 타당하지 않음을 말한다. 따라서 가법적 모형은 적절하지 않다고 볼 수 있다.
+
+
+## d. 
+중간값 다듬기 후 잔차를 계산하여 그로부터 각 도시가 갖는 기온의 특징을
+기술하시오.
+```{r}
+med.data$residuals
+```
+
+
+# 2. 
+perform.txt 라는 자료는 학생들의 수학(math)과 쓰기(writing) 점수를 기록한 것이다.
+성별(gender), 인종(race.ethnicity), 부모의 교육 수준(parental.level.of.education), 점심
+식사 종류(lunch: standard 는 정상 가격, free/reduced 는 공짜 또는 할인된 가격의
+점심), 시험 준비 정도(test.preparation.course)와 같은 학생의 배경 정보가 같이
+포함되어 있다. 괄호 안에 각 변수의 변수명이 기재되어 있다.
+
+
+## a. 
+표와 그래프를 통해 이 대학에 지원한 학생들의 성별과 시험 준비 정도가
+어떻게 분포하는지 알아보고 특징을 기술하시오.
+
+```{r}
+perform <- read.table("C:/r-project/R-stat-package/data/perform.txt", header = T)
+glimpse(perform)
+tabb <- table(perform$gender, perform$test.preparation.course)
+mosaicplot(tabb, color = T)
+```
+
+
+## b. 
+한 대학에서는 수학 점수가 80 점이상이고 쓰기 점수가 4000 점 이상인
+학생을 신입생으로 선발한다. 시험 준비 정도에 따라 합격여부가 어떻게
+달라지는지 상대도수를 이용하여 빈도표와 막대그림을 그려보고 현상을
+기술하시오.
+
+```{r}
+idx1 <- perform$math >= 80
+idx2 <- perform$writing >= 4000
+perform_1 <- perform %>% 
+  mutate(Admit = idx1&idx2)
+glimpse(perform_1)
+prop.table(table(perform_1$test.preparation.course, perform_1$Admit), margin = 1)
+tab <- table(perform_1$test.preparation.course, perform_1$Admit)
+colnames(tab) <- c("Rejected", "Admitted")
+
+tab.row <- apply(tab, 1, sum)
+tab.r <- diag(1/tab.row) %*% tab *100
+colnames(tab.r) <- c("Rejected", "Admitted")
+rownames(tab.r) <- c("complted", "none")
+barplot(t(tab.r), legend = colnames(tab.r))
+
+tab.col <-apply(tab, 2, sum) 
+tab.c <- tab %*% diag(1/tab.col) * 100
+colnames(tab.c) <- c("Rejected", "Admitted")
+barplot(tab.c, legend = rownames(tab.c))
+
+```
+
+## c. 
+시험지 준비된 집단과 그렇지 않은 집단에 대해 각각 성별과 합격여부에
+대한 2 원 빈도표와 모자이크 플랏을 생성하고 해석하시오.
+
+```{r}
+tab_1 <- table(perform_1[perform_1$test.preparation.course == "completed",]$gender, perform_1[perform_1$test.preparation.course == "completed",]$Admit)
+colnames(tab_1) <- c("Rejected", "Admitted")
+
+tab_2 <- table(perform_1[perform_1$test.preparation.course == "none",]$gender, perform_1[perform_1$test.preparation.course == "none",]$Admit)
+colnames(tab_2) <- c("Rejected", "Admitted")
+
+mosaicplot(tab_1, color = T)
+mosaicplot(tab_2, color = T)
+```
+
+
+## d. 
+시험준비정도, 성별, 합격여부를 모두 고려하여 모자이크 플랏을 그리고
+특이점이 발견되지 않는지 논하시오.
+
+```{r}
+idx_m <- perform_1$gender=="male"
+idx_f <- perform_1$gender=="female"
+tab_m <- table('test.preparation.course' = perform_1[idx_m, ]$test.preparation.course, "Admit" = perform_1[idx_m, ]$Admit)
+tab_f <- table('test.preparation.course' = perform_1[idx_f, ]$test.preparation.course, "Admit" =  perform_1[idx_f, ]$Admit)
+column.names <- c("Rejected", "Admitted")
+row.names <- c("complted", "none")
+matrix.names <- c("Male", "Female")
+tab_e <- array(data = c(tab_m, tab_f), dim = c(2,2,2), dimnames = list("test.preparation.course" = row.names, "Admit" = column.names, "gender" = matrix.names))
+
+
+mosaicplot(~  Admit + test.preparation.course + gender , data = tab_e , off = 2, color = T)
+```
+

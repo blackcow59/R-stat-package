@@ -1,0 +1,37 @@
+---
+title: "homework_201701194_choehojin"
+author: "Hojin Choe"
+date: '2020 10 29 '
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+![Solution1](figures/KakaoTalk_20201029_004555393.jpg)
+
+![Solution2](figures/KakaoTalk_20201029_004555393_01.jpg)
+
+
+1번에서의 조건(n==1)이 만족하면 print() 만족하지않으면 move_hanoi()를 한번 더 써서 조건이 만족될때까지 반복되는 과정을 재귀함수를 사용할 수 있다.   
+그리고 3번의 설명처럼 같은과정을 한번 더 반복하게 되면서 재귀함수를 사용하면 된다.
+
+
+
+
+
+
+
+
+
+
+## 실행함수를 도식화 하면 다음과 같다  
+파란글씨는 함수의 진행과정, 빨간글씨는 move_hanoi(3,"A", "C", "B")를 예시로 사용할때의 진행과정이다.
+
+
+![Solution3](figures/KakaoTalk_20201029_004555393_02.jpg)
+
+![Solution4](figures/KakaoTalk_20201029_004555393_03.jpg)
+
+![Solution5](figures/KakaoTalk_20201029_004555393_04.jpg)

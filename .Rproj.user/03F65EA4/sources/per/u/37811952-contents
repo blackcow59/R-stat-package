@@ -1,0 +1,269 @@
+gameA <- function(reps = 10000, seed = NULL) {
+  seed = set.seed(seed)
+  x <- sample(c(2000, -1500), reps, replace = T)
+  cat("A 게임을 했을 때 기대되는 수익은",mean(x),"원임.\n")
+}
+gameA(seed = 20201217)
+
+
+
+gameB <- function(reps = 10000, seed = NULL) {
+  seed = set.seed(seed)
+  x <- sample(c(12000, 0, -11000), reps,replace = T, prob = c(1/6, 4/6, 1/6))
+  cat("B 게임을 했을 때 기대되는 수익은", 
+      mean(x),"원임.\n")
+}
+gameB(seed = 20201217)
+
+
+
+
+
+
+
+
+
+
+
+numberNeed <- function() {
+  x1 <- runif(1, 0, 1)
+  x <- NULL
+  i <- 1
+  while(x1 <= 1){
+    x <- runif(1, 0, 1)
+    x1 <- x1 + x
+    i <- i + 1
+  }
+  return(i)
+}
+numberNeed()
+
+
+
+
+
+numberNeed <- function(target = 1) {
+  count <- 0
+  csum <- 0 
+  while (csum < target) {
+    picked_num <- runif(1)
+    csum <- csum + picked_num
+    count <- count + 1
+  }
+  return(count)
+}
+
+
+
+
+X <- rep(NULL, reps = 10000)
+for(i in 1:10000) {
+  X[i] <- numberNeed()
+}
+mean(X)
+
+
+
+
+
+
+
+tab.X <- table(X)
+prop.table(tab.X)
+
+
+
+
+
+numberNeedSim <- function(seed = NULL,
+                       reps = 10000){
+  #browser()
+  seed <- set.seed(seed)
+  X <- rep(NULL, reps = reps)
+  for(a in 1:reps){
+    x1 <- runif(1, 0, 1)
+    x <- rep(NULL,reps = reps)
+    i <- 1
+    while(x1 <= 1){
+      x[i] <- runif(1, 0, 1)
+      x1 <- x1 + x[i]
+      i <- i + 1
+    }
+    X[a] <- i
+  }
+  tab.X <- table(X)
+  p.table <- prop.table(tab.X)
+  print(p.table)
+  cat("X의 기댓값은", mean(X), "\n.")
+}
+
+numberNeedSim(12345)
+
+
+
+
+
+numberNeedSim <- function(target = 1, reps = 1000, 
+                          seed = NULL, verbose = FALSE) 
+{
+  if (!is.null(seed)) set.seed(seed)
+  need <- rep(NA, reps)
+  for (i in 1:reps) need[i] <- numberNeed(target = target)
+  if (verbose) {
+    print(prop.table(table(need)))
+    cat("\n")
+    cat(sprintf("총합이 %d 보다 크기 위해 필요한 난수의 개수에 대한 기댓값은 %.3f 임.", 
+                target, mean(need)), "\n", sep = "")
+  }
+  invisible(mean(need))
+  
+}
+
+numberNeedSim(target = 1, reps = 10000, seed = 1234, verbose = TRUE)
+
+
+
+
+# 적중법
+hit_norm <- function(ntry) {
+  X <- 0
+  for (i in 1:ntry) {
+    uxy <- runif(2, 0, 1)  
+    if(uxy[2] < dnorm(uxy[1])) X <- X + 1
+  }
+  X/ntry
+}
+
+
+hit_norm2 <- function(ntry) {
+  uxy <- matrix(runif(2*ntry), ntry, 2)
+  sum(drop(uxy[,2]) < dnorm(uxy[,1]))/ntry
+}
+
+mean_norm <- function(ntry) {
+  x <- runif(ntry, 0, 1)
+  I = mean(dnorm(x))
+  print(I)
+}
+
+
+mean_norm(10000)
+hit_norm(10000)
+
+
+pnorm(1)-0.5
+
+
+
+
+
+
+
+
+
+calCI <- function(n = 20, mean = 0, 
+                  sigma = 1, alpha = 0.05) {
+  x <- rnorm(n, mean = mean, sd = sigma)
+  cat("(1-a) X 100 % 신뢰구간은 [ 0, ",(n-1)*sd(x)^2/qchisq(alpha,n - 1, lower.tail = T),"]\n")
+}
+
+#check
+
+calCI(100, 0, 1, 0.05)
+
+
+
+calCI.1 <- function(seed = NULL,
+                    ntry = 10000,
+                    n = 30,
+                    mean = 4, 
+                    sigma = 3,
+                    alpha = 0.05) {
+  #browser()
+  seed = set.seed(seed)
+  X <- rep(NULL, ntry)
+  for (i in 1:ntry) {
+    x <- rnorm(n, mean, sigma)
+    X[i] <- (n-1) * sd(x)^2 / qchisq(alpha, n - 1, lower.tail = T)
+  }
+  1 - length(X[X>=9])/ntry
+}
+calCI.1(12345, ntry = 10000, n = 30, mean = 4, sigma = 3, alpha = 0.05)
+
+
+
+
+calCI <- function(n = 20, mean = 0, 
+                  sigma = 1, alpha = 0.05) {
+  x <- rnorm(n, mean = mean, sd = sigma)
+  (n - 1) * var(x) / qchisq(alpha, df = n - 1, lower.tail = T)
+}
+
+
+set.seed(12345)
+n <- 30; alpha <- 0.05; reps <- 10000
+mu <- 4; sigma <- sqrt(9)
+ucl <- replicate(reps, calCI(n = n, mean = mu, 
+                             sigma = sigma, alpha = alpha))
+1 - sum(ucl > 9)/reps
+
+
+calCI.2 <- function(n = 20, df = 2, alpha = 0.05){
+  x <- rchisq(n = n, df = df)
+  (n - 1) * var(x) / qchisq(alpha, df = n - 1)
+}
+
+n <- 30; alpha <- 0.05; reps <- 10000; degf <- 4
+set.seed(12345)
+
+ucl2 <- replicate(reps, calCI.2(n = n, df = degf, alpha = alpha))  
+1 - sum(ucl2 > 8) / reps
+
+
+
+
+
+
+
+# 1. beta(old) : 초기값 설정
+# 2. L(beta(old)) : 미분값 계산
+# 3. beta(new) = beta(old) - ??
+# 4. L(beta(new)) : 미분값 계산
+# 5. |L(beta(old)) - L(beta(new))| 가 임계치 보다 작을때 까지 반복
+
+grad_fun <- function(x, y, beta) {
+  X <- cbind(1, x)
+  (t(X) %*% X %*% beta) - (t(X) %*% y)
+}
+
+obj_fun <- function(x, y, beta) {
+  X <- cbind(1, x)
+  t(y - X %*% beta) %*% (y - X)
+}
+
+gradient_descent <- function(x, y,
+                             max_iter = 50000,
+                             lamda = 0.00001,
+                             beta = c(0, 0),
+                             tol = 1e-7) {
+  #browser()
+  iters <- 0
+  diffrence <- Inf
+  while(diffrence > tol & iters < max_iter) {
+    grad <- grad_fun(x, y, beta)
+    obj_o <- obj_fun(x, y, beta)
+    beta.new <- beta - lamda * grad
+    obj_n <- obj_fun(x, y, beta.new)
+    diffrence <- abs(obj_o - obj_n)
+    iters <- iters + 1
+    beta <- beta.new
+  }
+  cat("추정된 회귀계수는", "beta0 = ",beta[1],",beta1 = ",beta[2], "이다.\n")
+}
+
+
+gradient_descent(cars$speed, cars$dist)
+lm(cars$dist ~ cars$speed)
+
+
+

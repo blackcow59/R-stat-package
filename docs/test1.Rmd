@@ -1,0 +1,309 @@
+---
+title: "test1"
+author: "Hojin Choe"
+date: '2020 9 13 '
+output: 
+  html_document : 
+    theme : darkly
+    highlight : tango
+    toc : TRUE
+    toc_float : TRUE
+    number_section : TRUE
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+# 코드 실행 관련 청크 옵션  
+-eval : chunk 안에 작성한 스크립트(코드)의 실행 여부(TRUE/FALSE, default = TRUE)  
+-include : chunk 출력물을 출력 문서에 포함할지 여부 결정(TRUE/FALSE, default = TRUE)  
+
+# 소스 코드 출력(테스트)결과 관련 청크 옵션  
+-echo : R 실행 결과에 대응하는 코드 출력 여부(TRUE/FALSE, default = TRUE)  
+-result : 출력 결과 포맷 지정을 위한 옵션으로 추가적으로 3가지 옵션 선택가능 : 'hide', 'asis', 'hold', 'markup'  
+-error : 코드 또는 스크립트에 구문 오류 메세지 출력 여부
+-message : 코드로부터 생성된 메세지 출력 여부  
+-warning : 경고 메세지 출력 여부  
+
+
+
+
+
+
+- default output
+
+
+```{r ex01-1}
+summary(iris )
+hist(iris $Sepal.Length)
+```
+
+
+
+- echo : 코드 청크에 작성한 R-script 출력 여부 결정  
+  - echo = FALSE 이면 소스 코드 출력 없이 그림 결과만 출력 
+  
+- echo : TRUE
+```{r ex01-2, echo=TRUE}
+require(ggthemes) # ggtheme 패키지 불러오기
+require(ggpubr) # ggpubr 패키지 불러오기
+iris %>% 
+  ggplot(aes(x = Sepal.Length, y = Petal.Width, color = Species)) +
+  geom_point(size = 5) +
+  theme_pubclean() + 
+  theme(axis.line = element_line(size = 0.8),
+        legend.title = element_text(face = "bold", size = 15),
+        legend.text = element_text(face = "bold", size = 12))
+```
+
+
+- echo : FALSE  
+```{r ex01-3, echo=FALSE}
+require(ggthemes) # ggtheme 패키지 불러오기
+require(ggpubr) # ggpubr 패키지 불러오기
+iris %>% 
+  ggplot(aes(x = Sepal.Length, y = Petal.Width, color = Species)) +
+  geom_point(size = 5) +
+  theme_pubclean() + 
+  theme(axis.line = element_line(size = 0.8),
+        legend.title = element_text(face = "bold", size = 15),
+        legend.text = element_text(face = "bold", size = 12))
+```
+
+
+
+- result : 코드의 텍스트 출력 결과 포맷 지정
+  - markup : (default) : 코드 청크 내 스크립트의 출력 형태에 따라 텍스트 출력 결과를 mark-up  
+  - asis : 변환하지 않은 원래 R출력 결과 그대로(asis)출력  
+  - hide : R 스크립트로 생성된 텍스트 출력을 보여주지 않음(warning, message 출력 예외)  
+  - hold : 코드 청크로 생성된 모든 소스 및 출력을 단일 블록으로 축소  
+
+
+
+- result : 'markup'  
+```{r, results='markup'}
+# result = 'markup'인 경우 소스 코드 블럭 내에 코드 출력
+cat("I'm raw **Markdown** content.\n")
+```
+
+
+- result : 'asis'  
+```{r, results='asis'}
+# result = 'asis' 인 경우 텍스트를 그대로 md 파일에 입력
+cat("I'm raw **Markdown** content.\n")
+```
+
+
+- result : 'hide'  
+```{r, results='hide'}
+# result = 'hide' 인 경우 텍스트 결과를 출력하지 않음
+cat("I'm raw **Markdown** content.\n")
+```
+
+- result : 'hold'  
+```{r}
+# result = 'hold' 가 아닌 경우 한 라인 별 출력 결과 생성
+x <- rnorm(10)
+x
+y <- rnorm(10, 1, 2)
+y
+x + y
+```
+
+
+```{r, results='hold'}
+# result = 'hold'인 경우 코드 부분과 출력 부분이 따로 블록 처리
+x <- rnorm(10)
+x
+y <- rnorm(10, 1, 2)
+y
+x + y
+```
+
+- error : 코드 청크 내 스크립트에 오류에 대한 보존 여부( stop() )  
+  - 기본적으로 Rmarkdown 컴파일 시 error에 대한 옵션이 FALSE 이기 때문에 스크립트(코드)에 오류가 포함되면 컴파일이 정지됨.
+
+
+- error = TRUE  
+```{r, error=TRUE}
+# error = TRUE 이면 오류 메세지를 포함한 텍스트 결과를 출력
+3x <- 3
+x <- 25 # 위 행이 구문 오류를 포함하고 있기 때문에 오류 이후의 코드는 실행되지 않음
+x
+```
+
+
+- message/warning : 텍스트 출력물 중 경고(warning, warning() 함수의 출력 결과) 메세지 출력 여부 결정  
+
+- message = TRUE  
+```{r, message=TRUE}
+# message = TRUE 인 경우 함수 message 출력
+testit <- function() {
+  message("testing package startup messages")
+  packageStartupMessage("initializing ...", appendLF = FALSE)
+  Sys.sleep(1)
+  packageStartupMessage("done")
+}
+
+testit()
+
+```
+
+- message = FALSE  
+```{r, message=FALSE}
+# message = FALSE 인 경우 메세지 출력하지 않음
+testit()
+
+```
+
+
+- warning = TRUE  
+```{r}
+x <- c(1, 2, "new", 4:10)
+x <- as.numeric(x)
+```
+
+- warning = FALSE  
+```{r, warning=FALSE}
+x <- c(1, 2, "new", 4:10)
+x <- as.numeric(x)
+```
+
+
+# 코드 서식 관련 청크 옵션  
+
+- comment : 소스 코드 실행 출력의 각 줄 앞에 붙는 표시문자 출력 여부 : 기본 값은 '##' 임
+- highlight : 구문 강조 여부  
+- prompt : R 프롬프트 출력 여부  
+- tidy : R 소스 코드 출력 정리 여부  
+
+
+- comment : 텍스트 출력물에 주석 표시(default)를 함으로써 코드와 출력 결과를 동시 선택과 복사를 가능(##는 주석 표시이기 때문에 실행되지 않음)  
+  - 주석 표시를 제거하고 싶다면 comment = NA 또는 comment = ` `  
+  
+
+- 디폴트 comment 사용  
+```{r}
+summary(iris)
+```
+
+
+- highlight : 구문 강조 표시 여부  
+   - highlight = FALSE 일 때 소스 코드 출력 결과  
+   
+```{r, highlight=FALSE}
+iris %>% 
+  ggplot(aes(x = Sepal.Length, y = Petal.Width, color = Species)) +
+  geom_point(size = 5) +
+  theme_pubclean() +
+  theme(axis.line = element_line(size = 0.8),
+        legend.title = element_text(face = "bold", size = 15),
+        legend.text = element_text(face = "bold", size = 12))
+```
+
+
+- prompt : R 콘솔 상 프롬프트 >, + 출력 여부  
+```{r, prompt=TRUE}
+# prompt = TRUE 인 경우 코드 출력 결과
+require(ggthemes) # ggtheme 패키지 불러오기
+require(ggpubr) # ggpubr 패키지 불러오기
+iris %>% 
+  ggplot(aes(x = Sepal.Length, y = Petal.Width, color = Species)) +
+  geom_point(size = 5) +
+  theme_pubclean() +
+  theme(axis.line = element_line(size = 0.8),
+        legend.title = element_text(face = "bold", size = 15),
+        legend.text = element_text(face = "bold", size = 12))
+```
+
+
+- tidy : 코드를 사용자가 지정(혹은 formatR::tidy_sorce() 함수에 초기값으로 지정된 코드 정리 값)한 줄 당 문자 길이 등을 반영해 코드를 정리
+  - tidy = TRUE 인 경우 자동으로 줄 바꿈  
+
+```{r, tidy=FALSE}
+# tidy = FALSE 인 경우 코드 출력 결과
+iris %>% ggplot(aes(x = Sepal.Length, y = Petal.Width, color = Species)) + geom_point(size = 5) + theme_pubclean() + theme(axis.line = element_line(size = 0.8), legend.title = element_text(face = "bold", size = 15), legend.text = element_text(face = "bold", size = 12))
+```
+
+
+```{r, tidy=TRUE}
+# tidy = TRUE 인 경우 코드 출력 결과
+iris %>% ggplot(aes(x = Sepal.Length, y = Petal.Width, color = Species)) + geom_point(size = 5) + theme_pubclean() + theme(axis.line = element_line(size = 0.8), legend.title = element_text(face = "bold", size = 15), legend.text = element_text(face = "bold", size = 12))
+```
+
+
+# 그림(plot)출력 관련 청크 옵션  
+- fig.glign : 최종 문서에 plot 정렬 방식 결정(center/left/right)  
+- fig.height/fig.width : 그림 크기(단위 : 인치)
+- fig.cap : 그림 캡션(문자열 입력)
+- dpi : dot per inche:출력 그림 해상도  
+
+
+
+# 알아두면 좋은 청크 형태  
+### Setup 청크  
+- 일반적으로 Rmarkdown 문서는 YAML 해더 뒤에 전역적 청크 옵션 지정과 R 패키지를 불러오는 것으로 시작
+- 청크 옵션은 knitr::opts_chunk$set(청크 옵션 지정)형태로 지정 가능
+- 다음은 Rstudio 에서 Rmd 문서 생성 시 맨 처음 나오는 코드 청크 예시임
+
+```{r ex01-4, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+- 일반적 활용 예시
+```{r, option-init, include=TRUE}
+knitr::opts_chunk$set(root.dir = '../..', # 프로젝트 폴더 지정
+                      eval = TRUE,
+                      echo = FALSE,
+                      cache = FALSE,
+                      include = TRUE,
+                      tidy = TRUE,
+                      tidy.opts = list(blank = FALSE, width.cutoff = 120), # 소스 출력길이 지정
+                      message = FALSE,
+                      warning = FALSE,
+                      engine = "R", # Chunks will always have R code, unless noted
+                      error = TRUE,
+                      fig.path = "Figures/", # Set the figure options
+                      fig.align = "center",
+                      fig.width = 7,
+                      fig.height = 7,
+                      fig.keep = 'all', fig.retina = 2)
+```
+
+
+
+### 이미지 불러오기  
+```{r, fig.cap = "Graph."}
+knitr::include_graphics("Figures/unnamed-chunk-16-1.png", dpi = NA)
+```
+
+
+
+### R 생성 도표 포함  
+```{r, fig.cap = "Graph"}
+cars %>% 
+  ggplot(aes(x = speed, y = dist)) +
+  geom_point(size = 5) +
+  theme_tufte(base_size = 15) # ggtheme::theme_tufte
+```
+
+
+
+### 테이블 삽입  
+- 가장 간단한 테이블은 knitr::kable()함수를 통해 생성 가능  
+- kable() 함수는 갖아 단순한 형태의 표만 생성하기 때문에 복잡한 표를 만들기에는 한계까 존재함  
+- 이를 보환하기 위해 다음과 같은 패키지 활용   
+  - kableExtra : HTML 또는 LaTeX 용 표 생성
+    - [https://cran.r-project.org/web/packages/kableExtra/vignettes/awesome_table_in_html.html](https://cran.r-project.org/web/packages/kableExtra/vignettes/awesome_table_in_html.html)  
+    - [https://cran.r-project.org/web/packages/kableExtra/vignettes/awesome_table_in_pdf.pdf](https://cran.r-project.org/web/packages/kableExtra/vignettes/awesome_table_in_pdf.pdf)  
+  - flextable + officer : HTML, 워드 문서 표 작성
+    - [https://davidgohel.github.io/flextable/](https://davidgohel.github.io/flextable/)  
+    
+
+```{r}
+knitr::kable(head(iris))
+```
+

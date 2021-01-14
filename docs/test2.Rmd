@@ -1,0 +1,103 @@
+---
+title: "test2"
+author: "Hojin Choe"
+date: '2020 9 26 '
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+head(mtcars, 5)
+N <- nrow(mtcars)
+```
+
+
+mtcars 데이터셋에 포함된 자동차는 `r N`개다.
+
+# 1.6 YAML  
+
+- R markdown 문서의 가장 처음에 정의하는 metadata  
+- .Rmd 파일을 .md 파일로 변환 후 최종 출력 문서 생성 시 필요한 pandoc의 옵션을 설정하는 것과 같은 의미임  
+- 일반적으로 문서 형태 및 생성을 위해 사용하는 R package(예 : bookdown, officedown, rticles 등)에 따라 YAML 구성 요소가 달라짐  
+
+
+
+
+## 기본 문법  
+- /# : 주석처리  
+- YAML 문서의 시작과 끝은 ---로 정의함  
+- 기본적으로 콜론( : )으로 구분된 태그(키) : 값 쌍으로 구성됨 -> key : value  
+  - 여기서 콜론 바로 다음에는 반드시 공백문자가 있어야 함  
+- 한 key의 하위 키는 리스트 형태로 표현하고, 하위 키는 두 개 이상의 스페이스로 공백을 주어 표현  
+
+
+---
+key : value
+  subkey1 : value1
+  subkey2 : value2
+    subsubkey1 : value3
+---  
+
+
+## R Markdown 기본 YAML 구조  
+```{r}
+# ---
+# title : "문서 제목" # 일반적으로 따옴표 사용
+# subtitle : "문서 부제목"
+# author : "문서 작성자"
+# date : "문서 작성일자"
+# output : 
+#   - "html_document"
+#   - "word_document"
+#   - "pdf_document"
+#   - "md_document"
+#   - "isoslides_presentation"
+#   - "slidy_presentation"
+#   - "beamer_presentation"
+# bibliography : 참고문헌.bib # bibtex 서식 활용
+# .
+# .
+# .
+# ---
+
+```
+
+
+
+
+## 1.7 참고문헌 인용  
+- 참고문헌 정보가 BibTex 포맷으로 저장된 .bib파일을 YAML에 선언 후 인용 가능  
+- 강의 3주차-03 21분정도 부터 참고  
+
+
+### Bibtex 참고문헌 입력 형태  
+
+@ article{Shea2014,  
+author =    {sHea, Nicholas and Boldt, Annika},  
+journal =   {Trends on Cognitive Sciences},  
+pages =     {183 -- 193},  
+title =     {{Supra-personal cognitive control}},  
+volum =     {18},  
+year =      {2014},  
+doi =       {10.1016/j.tics.2014.01.006},  
+}  
+
+
+### YAML에 bib 파일 지정  
+```{r}
+# ---
+# title : "Citataion test"
+# bibliography : example.bib
+# output : html_document
+# ---
+
+```
+
+
+
+
+- BibTex 포맷은 Google Scholar 에서 쉽게 획득 가능  
+- Citaion 스타일은 YAML 해더에 cl: style.csl로 변경 가능하며 [Zotero](https://www.zotero.org/)에서 .csl파일 다운로드 가능  

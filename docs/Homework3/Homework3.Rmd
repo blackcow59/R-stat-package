@@ -1,0 +1,203 @@
+---
+title: "Homework 3"
+author: "Hojin Choe"
+date: '2020 11 28 '
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## 3.6 Homework 3
+
+
+#### 1. 설명변수 $x_{i}$ 와 $t_{i}, i = 1, 2, ..., n$ 가 주어졌을 때 다음과 같은 반응변수 $y_{i}$에 대한 설명변수 $x_{i}$의 단순선형회귀모형(simple linear regression)을 고려해보자.
+
+$$ y_{i} = 5 + -2.5x_{i} + \epsilon_{i},\ \epsilon_{i} \sim \mathcal{N}(0, 9),\ x_{i} \sim \mathcal{U}(0, 10) $$
+
+
+#### a. 위 모형 $y_{i} = 5 + -2.5x_{i} + \epsilon_{i},\ \epsilon_{i}$ 를 행렬과 벡터 형태로 나타내기 위한 행렬 및 벡터를 정의하고, 정의한 행렬/벡터로 위 모형을 표시하시오.
+
+$$ y = \begin{bmatrix} y_{1} \\y_{2} \\\vdots \\y_{n} \end{bmatrix},\ X = \begin{bmatrix} 1 &x_{1} \\1 & x_{2} \\\vdots & \vdots\\ 1 & x_{n}\end{bmatrix},\ \beta = \begin{bmatrix} \beta_{0} \\\beta_{1} \end{bmatrix} (\beta_{0} = 5, \beta_{1} = -2.5),\ \epsilon =  \begin{bmatrix} \epsilon_{1} \\\epsilon_{2} \\\vdots \\\epsilon_{n} \end{bmatrix}$$
+
+
+$$ y = X\beta + \epsilon $$
+
+
+
+#### b. $y_{i}$가 정규분포를 따른다고 가정할 때, 설명변수 $x_{i}$가 주어졌을 때 반응변수 $y_{i}$는 어떤 분포를 따르는지 행렬과 벡터로 표시하시오.
+
+일반적으로 표현하면
+$$y = X\beta + \epsilon,\ \epsilon \sim N(0,\sigma^2) \\ y|X \sim N(X\beta,\sigma^2I_{n})\\ X = \begin{bmatrix} 1 &x_{1} \\1 & x_{2} \\\vdots & \vdots\\ 1 & x_{n}\end{bmatrix},\ \beta = \begin{bmatrix} \beta_{0} \\\beta_{1} \end{bmatrix},\ I_{n} = \begin{bmatrix}
+1 & \cdots & 0 \\
+\vdots & \ddots & \vdots \\
+0 & \cdots & 1
+\end{bmatrix} $$
+
+위 모형에서는
+$$ y|X \sim N(X\beta, 9I_{n}),\\ X = \begin{bmatrix} 1 &x_{1} \\1 & x_{2} \\\vdots & \vdots\\ 1 & x_{n}\end{bmatrix},\ \beta = \begin{bmatrix} \beta_{0} \\\beta_{1} \end{bmatrix} (\beta_{0} = 5, \beta_{1} = -2.5),\ I_{n} = \begin{bmatrix}
+1 & \cdots & 0 \\
+\vdots & \ddots & \vdots \\
+0 & \cdots & 1
+\end{bmatrix} $$
+
+
+
+#### c. 주어진 모형으로부터 $y_{i}$를 생성하고$(i = 1, ..., 30)$, 생성한 $x_{i}$와 $y_{i}$의 산점도를 그리시오. 단, seed 번호는 `20201111` 로 고정하시오
+```{r}
+set.seed(20201111)
+x <- runif(30, 0, 10)
+e <- rnorm(30, 0, 9)
+y <- 5 + -2.5*x + e
+# X <- cbind(1,x)
+# bhat <- solve(t(X) %*% X) %*% t(X) %*% y
+# yhat <- c(X %*% bhat)
+plot(y ~ x)
+```
+
+
+
+
+#### 2. 수업시간에 학습한 미분 가능한 특정 방정식의 해를 구하는 Newton-Raphson (N-R) 방법을 응용해 문제 1에서 생성한 `y`와 `x`로 부터 회귀식(`x`의 기울기와 절편)추정이 가능하다. 단순회귀 모형 및 다중회귀모형에서 회귀게수의 추정의 기본 아이디어는 오차 제곱의 합 $\sum_{}^{}\epsilon_{i} = \boldsymbol{\epsilon ^ \intercal \epsilon}$를 최소화하는 $\beta_{0}$와$\beta_{1}$ 또는 $\boldsymbol{\beta_{p\times1}}$을 찾는 것이고, 이 문제를 아래와 같이 나타낼 수 있다.
+$$ \arg min\left \{(\mathbf{y}_{n\times1} - \boldsymbol{X}_{n\times p}\boldsymbol{\beta}_{p\times1})^\intercal(\mathbf{y}_{n\times1} - \boldsymbol{X}_{n\times p}\boldsymbol{\beta}_{p\times1})  \right \} $$ 
+
+#### 위 식에서 $\mathcal{L(\beta)} = (\mathbf{y}_{n\times1} - \boldsymbol{X}_{n\times p}\boldsymbol{\beta}_{p\times1})^\intercal(\mathbf{y}_{n\times1} - \boldsymbol{X}_{n\times p}\boldsymbol{\beta}_{p\times1})$ 라고 하면, $\mathcal{\partial L(\boldsymbol{\beta})/ \partial \boldsymbol{\beta}} = 0$를 만족하는 $\boldsymbol{\beta}$ 일때 $\mathcal{L}(\boldsymbol{\beta})$가 최솟값을 갖는다. 따라서 학습한 N-R알고리즘의 핵심단계는 개념적으로 아래와 같이 변형할 수 있다.
+$$ \beta_{new} : =\beta_{old} - \frac{L(\beta)'}{L(\beta)''} $$
+
+위 식을 행렬 형태로 일반화 하면,
+$$ \boldsymbol{\beta}_{new} : =\boldsymbol{\beta}_{old} - [\boldsymbol{H}(\boldsymbol{\beta}_{old})]^{-1}\nabla \mathcal{L}(\boldsymbol{\beta}_{old}) $$  
+이고, 여기서 $\nabla \mathcal{L}(\boldsymbol{\beta})$와 $\nabla^2 \mathcal{L}(\boldsymbol{\beta})$은 아래와 같다.
+
+$$ \nabla \mathcal{L}(\boldsymbol{\beta}) = \frac{\partial \mathcal{L}(\boldsymbol{\beta})}{\partial \boldsymbol{\beta}}  = \boldsymbol{X}^\intercal \boldsymbol{X\beta} - \boldsymbol{X}^\intercal \mathbf{y}$$
+$$ \nabla^2 \mathcal{L}(\boldsymbol{\beta}) = \frac{\partial^2 \mathcal{L}(\boldsymbol{\beta})}{\partial \boldsymbol{\beta}^2}  = \boldsymbol{X}^\intercal \boldsymbol{X} $$
+
+
+#### a. 목적함수 $\mathcal{L}(\boldsymbol{\beta})$를 계산하기 위한 `obj_fun()`을 구현하기 위해 필요한 인수(argument)를 정의하고 함수를 작성하시오.
+```{r}
+set.seed(20201111)
+x <- runif(30, 0, 10)
+e <- rnorm(30, 0, 9)
+beta <- c(5, -2.5)
+obj_fun <- function(x = x, beta, e = e){
+  X <- matrix(c(rep(1,length(x)), x), nrow = length(x))
+  y <- X %*% beta + e
+  bhat <- solve(t(X) %*% X) %*% t(X) %*% y
+  yhat <- c(X %*% bhat)
+  t(y - yhat) %*% (y - yhat)
+}
+obj_fun(x, beta, e)
+```
+
+
+#### b. $\nabla \mathcal{L}(\boldsymbol{\beta})$를 도출하기 위한 `grad_fun()`을 구현하기 위해 필요한 인수(argument)를 정의하고 함수를 작성하시오.
+```{r}
+grad_fun <- function(x = x, beta, e = e) {
+  X <- matrix(c(rep(1,length(x)), x), nrow = length(x))
+  y <- 5 + -2.5*x + e
+  as.matrix(t(X) %*% X %*% beta - t(X) %*% y)
+}
+grad_fun(x, beta, e)
+```
+
+
+#### c. Hessian 행렬 $\nabla^2 \mathcal{L}(\boldsymbol{\beta})$을 도출하기 위한 `hess_fun()`함수를 구현하기 위해 필요한 필수 인수(agrgument)를 정의하고 함수를 작성하시오.
+```{r}
+hess_fun <- function(x) {
+  X <- matrix(c(rep(1,length(x)), x), nrow = length(x))
+  t(X) %*% X
+}
+hess_fun(x)
+```
+
+
+#### d. b ~ c에서 구현한 함수를 사용해 N-R 방법으로 선형회귀모형의 회귀계수 추정을 위한 `nr_linreg()`함수를 구현하기 위해 필요한 필수 인수(argument)를 정의하고 함수를 작성하시오.
+```{r}
+nr_linerg <- function(FUN, # 함수
+                      beta, # 초기값
+                      max_iters = 5000, # 최대 반복 횟수
+                      tol = 1.0e-9, 
+                      range = c(-Inf, Inf), 
+                           ...) 
+{ # browser()
+ iters <- 1;
+hess_fun <- function(x) {
+  X <- cbind(1, x)
+  t(X) %*% X
+}
+ gap <- beta - solve(hess_fun(x)) %*% FUN(x, beta, e)
+ 
+ while(iters < max_iters & abs(gap[1]) > tol & abs(gap[2]) > tol) {
+   # beta_new 계산 
+   beta_new <- beta - solve(hess_fun(x)) %*% FUN(x, beta, e)
+    
+   # beta_new 가 범위를 벗어난 경우 처리
+   if (beta_new[1] <= range[1]) beta_new[1] <- range[1]
+   if (beta_new[2] <= range[1]) beta_new[2] <- range[1]
+   if (beta_new[1] >= range[2]) beta_new[1] <- range[2]
+   if (beta_new[2] >= range[2]) beta_new[2] <- range[2]
+   iters <- iters + 1
+   beta <- beta_new # 초기값 업데이트
+ }
+ 
+ if (beta_new[1] == range[1] | beta_new[1] == range[2]) 
+   warning("마지막 점이 beta 범위의 경계선 상에 있습니다.")
+ if (beta_new[2] == range[1] | beta_new[2] == range[2]) 
+   warning("마지막 점이 beta 범위의 경계선 상에 있습니다.")
+ if (iters > max_iters) 
+   warning("최대 반복 때 까지 해를 찾지 못했습니다.")
+ return(list(solution = beta_new, iteration = iters))
+ 
+}
+
+set.seed(20201111)
+x <- runif(30, 0, 10)
+e <- rnorm(30, 0, 9)
+beta <- c(5, -2.5)
+grad_fun <- function(x = x, beta, e = e) {
+  X <- matrix(c(rep(1,length(x)), x), nrow = length(x))
+  y <- 5 + -2.5*x + e
+  as.matrix(t(X) %*% X %*% beta - t(X) %*% y)
+}
+nr_linerg(FUN = grad_fun, beta = beta, range = c(-10, 10))
+
+```
+
+#### e. 문제 1에서 생성한 `x`와 `y`에 대해 `lm(y ~ x)`으로 구한 회귀계수와 `nr_linerg(x, y)`로 추정한 회귀계수를 비교 하시오.
+```{r}
+lm(y ~ x)
+nr_linerg(FUN = grad_fun, beta = beta, range = c(-10, 10))
+```
+
+
+
+#### 3. 스타 크래프트의 테란 종족의 유닛 고스트는 스스로를 숨길 수 있고(클로킹), 공격력(10 ~ 11)을 갖고 있다. 게임 특성 상 언덕 위에 있는 상대를 언덕 아래에서 공격할 때 50%의 확률로 빗나간다. 고스트가 비밀 정찰 중 언덕 위에서 저그 진지를 순찰 중인 히드라리스크를 발견했다. 언덕 아래에서 고스트가 히드라를 공격했을 때, 평균적으로 몇 번의 공격을 해야 히드라리스크를 잡을 수 있는지 모의실험(반복횟수: 10,000회)을 통해 확인하시오. (단, 히드라리스크의 체력은 80이고, 히드라리스크는 오버로드의 부재로 고스트를 볼 수 없고, 고스트는 테란의 스캔 능력을 통해 언덕 위를 확인할 수 있다고 가정)
+```{r}
+hit_count <- function(HP = 80, # 히드라 체력
+                      hit = 0, # 공격수 초기값
+                      ntry = 10000 #반복 홧수 
+                      ) {
+  #browser()
+  hit_t <- rep(0,times = ntry) # 공격 횟수 입력을위한 변수
+  # 고스트의 공격과정 시뮬레이션
+  for(i in 1:ntry){
+    attack <- runif(ntry, 10, 11) # 공격력 10~11
+    hit <- 0 # 공격 수 초기화
+    while(HP > 0){
+      if(rbinom(1, size = 1, prob = 0.5) == 1){
+      HP <- HP - attack[a] # 언덕 위에 있으면 50% 확률로 빗나가는 처리를 한 체력 감소
+      }
+      hit <- hit + 1
+      a <- a + 1
+    }
+    HP <- 80 # 체력 초기화(새로운 히드라)
+    a <- 1 # 누적 반복 횟수 초기화
+    hit_t[i] <- hit # 공격 횟수 입력
+  }
+  hit_m <- mean(hit_t) # 평균 공격 횟수
+  cat("고스트가 평균적으로", hit_m, "번 공격해야 히드라리스크를 잡을 수 있다.","\n")
+}
+a <- 1
+hit_count()
+```
+

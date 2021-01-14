@@ -1,0 +1,165 @@
+---
+title: "R Markdown simple Example"
+author: "Hojin Choe"
+date: '2020 9 13 '
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# 1.3.1 텍스트 문법
+
+### 강조(emphasis)  
+
+이텔릭체 : *italic1*, _italic2_  
+볼드체 : **bold1**, __bold2__  
+
+
+### Inline code
+
+`inline code`
+
+
+### 아래/위 첨자
+
+아래첨자 : subscript~2~  
+위첨자 : subscript^2^
+
+
+### 삭제표시
+
+~~strikethrough
+
+
+### 생략표시
+
+...
+
+
+### 긴/짧은 대쉬
+
+짧은 대쉬 : --  
+긴 대쉬 : ---
+
+
+### 특수문자 탈출 지정자
+
+\*, \_, \~, \\
+
+
+### 하이퍼링크
+
+[링크이름](https://zorba78.github.io/stat-package-lecture/index.html)
+
+
+### 외부그림 삽입
+
+![그림이름](C:\\Users\\choi8\\바탕 화면\\최호진\\제목 없음.png)
+
+
+### 강제 줄바꿈
+
+하나의 줄에서 공백(space) 두 개 이상 또는 백슬래시(\\)하나 입력 후 앤터  
+
+End a line with two spaces to start\
+a new paragraph
+
+End a line with two spaces to start  
+a new paragraph
+
+
+### 각주
+A footnote^[각주내용]
+
+
+### 주석
+<!-- this is a comment that won't be shown -->  
+단축키로 Ctrl + Shift + C 사용 가능  
+
+
+
+
+
+
+
+# 1.3.2 Block-level-elements
+
+### 장/절
+
+# Header 1 (chapter, 장)
+## Header 2 (section, 절)
+### Header 3 (subsection, 관)
+
+
+### 목록
+
+#### 비순서목록 : -, *, + 중 어느 하나로 입력 가능
+
+- one item
+* two item
+  + sub item 1
+  + sub item 2
+    - subsub item 1
+    - subsub item 2
+
+#### 순서목록 : 비순서 목록의 기호 대신 숫자로 리스트 생성
+
+1. the first item
+  - sub item 1
+2. the second item
+3. the third item
+
++ 같은 숫자나 순서에 다른 숫자로 적어도 순서대로 목록 생성
+7. the fourth item
+7. the fifth item
+7. the sixth item
+
+
+### 인용구 : > 로 시작
+
+> There are three kinds of lies : lies, damn lies, and statistics
+>
+> --- Benjamin Disraeli
+
+
+
+
+
+
+
+
+# 1.3.3 수식 표현(math expression)
+
+-줄 안에 수식 입력 시 $수식표현$ 으로 입력  
+-수식 display style(보통 교과서에 정리 및 정의에 기술된 수식들)적용 시 $$ ~ $$ 안에 수식 입력  
+-수식 표현은 LaTeX의 수식 표현을 동일하게 준용([https://www.latex4technics.com/, https://latex.codecogs.com/legacy/eqneditor/editor.php](https://www.latex4technics.com/, https://latex.codecogs.com/legacy/eqneditor/editor.php)에서 수식 입력 명령어 학습 가능)  
+-LaTeX 수식 입력 코드는 
+- 예시
+
+
+-inline equation : $P(X = x) = f(x; n, p) = {n \choose x} p^x (1-p)^{n-x}$  
+-Math block : $$P(X = x) = f(x; n, p) = {n \choose x} p^x (1-p)^{n-x}$$  
+
+$ $ 또는  $$ $$ 안에 LaTeX에서 제공하는 수식 함수 사용 가능
+
+$$\begin{array}{ccc}  
+x_{11} & x_{12} & x_{13}\\  
+x_{21} & x_{22} & x_{23}  
+\end{array}$$
+
+
+
+$$\Theta = \begin{pmatrix}\alpha & \beta\\  
+\gamma & \delta  
+\end{pmatrix}$$
+
+
+
+$$\begin{align}  
+g(X_{n}) &= g(\theta)+g'({\tilde{theta}})(X_{n}-\theta) \notag \\  
+\sqrt{n}[g(X_{n})-g(\theta)] &= g'\left({\tilde{\theta}}\right)  
+  \sqrt{n}[X_{n}-\theta ]  
+\end{align}$$
+
